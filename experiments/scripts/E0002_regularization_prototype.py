@@ -338,8 +338,8 @@ def residuals(mesh, V, w, with_jac=True):
             e = []
             for k in range(3):
                 e += [(0, 3 * ic + k, 2.0 * wi * (ca[k] - cb[k])),
-                      (0, 3 * ib + k, -2.0 * wi * cb[k]),
-                      (0, 3 * ia + k, 2.0 * wi * ca[k])]
+                      (0, 3 * ib + k, 2.0 * wi * cb[k]),
+                      (0, 3 * ia + k, -2.0 * wi * ca[k])]
             push(rv, e)
     # 全局面积项
     if w.get("area", 0.0) > 0 and (len(mesh.quads) or len(mesh.tris)):
