@@ -173,14 +173,14 @@ def make_flat_tri(nx=12, ny=12, noise=0.03, rule="diagonal"):
     mesh = make_flat_quad(nx, ny, noise=noise)
     q = mesh.quads
     tris = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
-    if rule == "shortest":
+    if rule in ("shortest", "longest"):
         bases = np.zeros((len(tris), 2), int)
         for t, f in enumerate(tris):
             P = mesh.V[f]
             lens = [np.linalg.norm(P[1] - P[2]), np.linalg.norm(P[2] - P[0]), np.linalg.norm(P[0] - P[1])]
-            k = int(np.argmin(lens))
+            k = int(np.argmin(lens) if rule == "shortest" else np.argmax(lens))
             bases[t] = [(k + 1) % 3, (k + 2) % 3]
-        name = "T4b-flat-tri-shortest-base"
+        name = "T4b-flat-tri-shortest-base" if rule == "shortest" else "T4-flat-tri-longest-base"
     else:
         bases = np.zeros((len(tris), 2), int)
         bases[:len(q)] = [0, 2]
@@ -414,7 +414,32 @@ def cg(matvec, b, tol=1e-12, maxit=800):
     return x
 
 
-def presmooth(mesh, V, passes=3, omega=0.3):
+
+def pcg(matvec, b, diag, tol=1e-12, maxit=3000):
+    """Jacobi 预条件共轭梯度（对角预条件）。"""
+    x = np.zeros_like(b)
+    r = b.copy()
+    z = r / diag
+    p = z.copy()
+    rz = float(r @ z)
+    bnorm = max(float(b @ b), 1e-30)
+    for _ in range(maxit):
+        Ap = matvec(p)
+        den = float(p @ Ap)
+        if den <= 1e-30:
+            break
+        a = rz / den
+        x += a * p
+        r -= a * Ap
+        if float(r @ r) / bnorm < tol:
+            break
+        z = r / diag
+        rz2 = float(r @ z)
+        if rz <= 1e-300:
+            break
+        p = z + (rz2 / rz) * p
+        rz = rz2
+    return x
     V = V.copy()
     for _ in range(passes):
         Vn = V.copy()
@@ -494,7 +519,8 @@ def solve_local_global(mesh, w, iters=300, omega=0.7):
         b = spmv(cols, rows, vals, yv, n)
         lam = 1e-9
         mv = lambda x: spmv(cols, rows, vals, spmv(rows, cols, vals, x, len(yv)), n) + lam * x
-        x = cg(mv, b, tol=1e-12, maxit=1000)
+        diag = np.bincount(cols, weights=vals * vals, minlength=n) + lam
+        x = pcg(mv, b, np.maximum(diag, 1e-30), tol=1e-12, maxit=3000)
         xs = x.reshape(-1, 3)
         Vn = V.copy()
         Vn[free] = V[free] + omega * (xs - V[free])
@@ -514,12 +540,16 @@ def solve_gauss_newton(mesh, w, iters=100, lam=1e-4):
     energy = 0.5 * float(r @ r)
     n = 3 * mesh.nfree
     trace = [energy]
+    if energy < 1e-18:
+        mesh.V = V
+        return {"iterations": 0, "energy_start": energy, "energy_end": energy, "trace": trace}
     for it in range(iters):
         Jt = spmv(cols, rows, vals, -r, n)
         if float(Jt @ Jt) < 1e-24:
             break
         Hf = lambda x: spmv(cols, rows, vals, spmv(rows, cols, vals, x, len(r)), n) + lam * x
-        dx = cg(Hf, Jt, tol=1e-13, maxit=800)
+        diag = np.bincount(cols, weights=vals * vals, minlength=n) + lam
+        dx = pcg(Hf, Jt, np.maximum(diag, 1e-30), tol=1e-13, maxit=3000)
         step, improved = 1.0, False
         for _ in range(20):
             Vt = V.copy()

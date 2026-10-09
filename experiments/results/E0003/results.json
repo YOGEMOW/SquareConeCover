@@ -1,0 +1,199 @@
+{
+  "experiment": "E0003",
+  "date": "2026-10-09",
+  "weights": {
+    "par": 1.0,
+    "diag": 1.0,
+    "plan": 1.0,
+    "iso": 1.0,
+    "area": 100.0,
+    "smooth": 0.3,
+    "pos": 1e-06
+  },
+  "cases": [
+    {
+      "name": "C1-flat-quad-clean-40",
+      "n_vertices": 1681,
+      "n_quads": 1600,
+      "n_tris": 0,
+      "n_anchors": 160,
+      "iterations": 0,
+      "energy_start": 1.4036608843001718e-26,
+      "energy_end": 1.4036608843001718e-26,
+      "runtime_s": 0.3222236633300781,
+      "after": {
+        "quad_before": {
+          "angle_p95_deg": 0.0,
+          "angle_max_deg": 0.0,
+          "opposite_rel_p95": 0.0,
+          "parallel_rel_p95": 1.5700924586837737e-15,
+          "planarity_rel_p95": 0.0
+        },
+        "quad_after": {
+          "angle_p95_deg": 0.0,
+          "angle_max_deg": 0.0,
+          "opposite_rel_p95": 0.0,
+          "parallel_rel_p95": 1.5700924586837737e-15,
+          "planarity_rel_p95": 0.0
+        },
+        "area": {
+          "max_rel_drift": 0.0,
+          "p95_rel_drift": 0.0,
+          "global_rel_drift": 0.0
+        },
+        "flips": 0,
+        "anchor_move": 0.0,
+        "max_disp": 0.0,
+        "defect": {
+          "mean_defect_deg": 17.34681737061273,
+          "abs_mean_defect_deg": 17.34681737061273
+        }
+      },
+      "coplanarity_before": 0.0,
+      "coplanarity_after": 0.0
+    },
+    {
+      "name": "C2-flat-tri-longest-40",
+      "n_vertices": 1681,
+      "n_quads": 0,
+      "n_tris": 3200,
+      "n_anchors": 160,
+      "iterations": 0,
+      "energy_start": 2.1472007719691908e-24,
+      "energy_end": 2.1472007719691908e-24,
+      "runtime_s": 0.18566560745239258,
+      "after": {
+        "tri_before": {
+          "leg_rel_p95": 3.1401849173675546e-15,
+          "leg_rel_max": 3.1401849173675546e-15,
+          "min_angle_deg": 44.99999999999987
+        },
+        "tri_after": {
+          "leg_rel_p95": 3.1401849173675546e-15,
+          "leg_rel_max": 3.1401849173675546e-15,
+          "min_angle_deg": 44.99999999999987
+        },
+        "area": {
+          "max_rel_drift": 0.0,
+          "p95_rel_drift": 0.0,
+          "global_rel_drift": 0.0
+        },
+        "flips": 0,
+        "anchor_move": 0.0,
+        "max_disp": 0.0,
+        "defect": {
+          "mean_defect_deg": 17.346817370612737,
+          "abs_mean_defect_deg": 17.346817370612737
+        }
+      },
+      "coplanarity_before": 0.0,
+      "coplanarity_after": 0.0
+    },
+    {
+      "name": "C3-cylinder-clean-24x20",
+      "n_vertices": 525,
+      "n_quads": 480,
+      "n_tris": 0,
+      "n_anchors": 21,
+      "iterations": 18,
+      "energy_start": 1.3364162734690204,
+      "energy_end": 0.3719887041607643,
+      "runtime_s": 19.937766790390015,
+      "after": {
+        "quad_before": {
+          "angle_p95_deg": 0.0,
+          "angle_max_deg": 0.0,
+          "opposite_rel_p95": 0.0,
+          "parallel_rel_p95": 8.808766407467758e-16,
+          "planarity_rel_p95": 1.2729575838742428e-18
+        },
+        "quad_after": {
+          "angle_p95_deg": 0.854385964703087,
+          "angle_max_deg": 10.418041865921907,
+          "opposite_rel_p95": 0.01388206557840649,
+          "parallel_rel_p95": 0.009870735668617077,
+          "planarity_rel_p95": 1.0295508946618171e-06
+        },
+        "area": {
+          "max_rel_drift": 0.986128712207571,
+          "p95_rel_drift": 0.9109362794550436,
+          "global_rel_drift": -0.0008124745449637148
+        },
+        "flips": 0,
+        "anchor_move": 0.0,
+        "max_disp": 0.3745457592506885,
+        "defect": {
+          "mean_defect_deg": 30.857142930398748,
+          "abs_mean_defect_deg": 30.857150322821578
+        }
+      },
+      "coplanarity_before": 0.1109175451182457,
+      "coplanarity_after": 0.005044916317197163,
+      "determinism_max_diff": 0.0
+    },
+    {
+      "name": "C4-spherecap-clean-20",
+      "n_vertices": 441,
+      "n_quads": 400,
+      "n_tris": 0,
+      "n_anchors": 80,
+      "iterations": 6,
+      "energy_start": 0.12222193665167586,
+      "energy_end": 0.1207484301540054,
+      "runtime_s": 3.6697916984558105,
+      "after": {
+        "quad_before": {
+          "angle_p95_deg": 1.061327050563993,
+          "angle_max_deg": 1.0838875115731668,
+          "opposite_rel_p95": 0.015211890189476874,
+          "parallel_rel_p95": 0.007906416563914925,
+          "planarity_rel_p95": 3.98245327668076e-17
+        },
+        "quad_after": {
+          "angle_p95_deg": 1.0451333858726441,
+          "angle_max_deg": 1.1630504324547388,
+          "opposite_rel_p95": 0.015466441173977066,
+          "parallel_rel_p95": 0.007872365676861746,
+          "planarity_rel_p95": 4.652324913709103e-05
+        },
+        "area": {
+          "max_rel_drift": 0.014417585315505873,
+          "p95_rel_drift": 0.008566845386012956,
+          "global_rel_drift": -0.002380704669300327
+        },
+        "flips": 0,
+        "anchor_move": 0.0,
+        "max_disp": 0.001970011250158846,
+        "defect": {
+          "mean_defect_deg": 33.469515893294535,
+          "abs_mean_defect_deg": 33.46969398255266
+        }
+      },
+      "coplanarity_before": 0.08308257941608492,
+      "coplanarity_after": 0.08190462953973741
+    }
+  ],
+  "performance": [
+    {
+      "n": 20,
+      "vertices": 441,
+      "quads": 400,
+      "time_5iter_s": 0.8369996547698975,
+      "s_per_iter": 0.27899988492329914
+    },
+    {
+      "n": 40,
+      "vertices": 1681,
+      "quads": 1600,
+      "time_5iter_s": 6.1343841552734375,
+      "s_per_iter": 2.044794718424479
+    },
+    {
+      "n": 60,
+      "vertices": 3721,
+      "quads": 3600,
+      "time_5iter_s": 28.721188068389893,
+      "s_per_iter": 9.573729356129965
+    }
+  ]
+}
