@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/SquareConeCover/scene.schema.json",
+  "title": "SquareConeCover scene",
+  "description": "实例列表：图元经过自身轴缩放（T*R*S 顺序）后的完整描述。单位米，Y 轴朝上。",
+  "type": "object",
+  "required": ["version", "units", "upAxis", "scaleRange", "instances"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string", "const": "0.1.0" },
+    "units": { "type": "string", "const": "meters" },
+    "upAxis": { "type": "string", "const": "Y" },
+    "scaleRange": {
+      "type": "array",
+      "description": "允许的缩放闭区间，默认 [0.01, 50]",
+      "items": { "type": "number", "exclusiveMinimum": 0 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "primitives": {
+      "type": "object",
+      "description": "图元名义尺寸（不可修改）",
+      "additionalProperties": false,
+      "properties": {
+        "square": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "side": { "type": "number", "const": 1.0 } }
+        },
+        "cone": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "height": { "type": "number", "const": 1.0 },
+            "radius": { "type": "number", "const": 0.5 }
+          }
+        }
+      }
+    },
+    "instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "primitive", "position", "rotation", "scale"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "description": "唯一标识" },
+          "primitive": { "type": "string", "enum": ["square", "cone"] },
+          "position": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rotation": {
+            "type": "array",
+            "description": "单位四元数 [w, x, y, z]",
+            "items": { "type": "number" },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "scale": {
+            "type": "array",
+            "description": "自身轴缩放 [sx, sy, sz]，恒正且落在 scaleRange 内",
+            "items": { "type": "number", "exclusiveMinimum": 0 },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}
