@@ -451,6 +451,18 @@ def pcg(matvec, b, diag, tol=1e-12, maxit=3000):
     return V
 
 
+def presmooth(mesh, V, passes=3, omega=0.3):
+    """少量拉普拉斯预平滑（仅移动自由顶点），用于改善优化初值。"""
+    V = V.copy()
+    for _ in range(passes):
+        Vn = V.copy()
+        for v in range(len(V)):
+            if mesh.anchors[v] or not mesh.nbr[v]:
+                continue
+            Vn[v] = (1 - omega) * V[v] + omega * V[mesh.nbr[v]].mean(axis=0)
+        V = Vn
+    return V
+
 def prep(mesh):
     mesh.E = mesh_edges(mesh)
     mesh.nbr = adjacency(len(mesh.V0), mesh.E)

@@ -1,0 +1,73 @@
+{
+  "experiment": "E0004",
+  "date": "2026-10-09",
+  "weights": {
+    "par": 1.0,
+    "diag": 1.0,
+    "plan": 1.0,
+    "iso": 1.0,
+    "area": 100.0,
+    "smooth": 0.3,
+    "pos": 1e-06
+  },
+  "correctness_checks": {
+    "residual_max_abs_diff": 2.220446049250313e-16,
+    "jacobian_same_structure": false,
+    "jacobian_max_abs_diff": NaN,
+    "n_residual": 615,
+    "nnz": 3150
+  },
+  "performance": [
+    {
+      "name": "T1-flat-quad",
+      "vertices": 441,
+      "quads": 400,
+      "tris": 0,
+      "iterations": 3,
+      "total_s": 0.06636834144592285,
+      "s_per_iter": 0.022122780481974285,
+      "energy_end": 1.5945742912355756
+    },
+    {
+      "name": "T1-flat-quad",
+      "vertices": 1681,
+      "quads": 1600,
+      "tris": 0,
+      "iterations": 3,
+      "total_s": 0.5523021221160889,
+      "s_per_iter": 0.18410070737202963,
+      "energy_end": 9.325462692991888
+    },
+    {
+      "name": "T1-flat-quad",
+      "vertices": 3721,
+      "quads": 3600,
+      "tris": 0,
+      "iterations": 3,
+      "total_s": 1.3349454402923584,
+      "s_per_iter": 0.44498181343078613,
+      "energy_end": 19.178077858418764
+    },
+    {
+      "name": "T1-flat-quad",
+      "vertices": 10201,
+      "quads": 10000,
+      "tris": 0,
+      "iterations": 3,
+      "total_s": 3.887821674346924,
+      "s_per_iter": 1.2959405581156414,
+      "energy_end": 38.493640376100274
+    }
+  ],
+  "large_test": {
+    "name": "T1-flat-quad",
+    "vertices": 49284,
+    "quads": 48841,
+    "tris": 0,
+    "iterations": 2,
+    "total_s": 10.787418365478516,
+    "s_per_iter": 5.393709182739258,
+    "energy_end": 573.4683507193063,
+    "wall_s": 11.16732120513916
+  }
+}
