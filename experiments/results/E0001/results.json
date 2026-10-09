@@ -1,0 +1,65 @@
+{
+  "experiment": "E0001",
+  "date": "2026-10-09",
+  "python": "3.10.6",
+  "n_default": 262144,
+  "checks": [
+    {
+      "id": "P1 圆底解析对照 Theta = 2piA/sqrt(H^2+A^2)",
+      "passed": true,
+      "metric": 4.720604269032102e-12
+    },
+    {
+      "id": "P5 圆底侧面积 = pi*A*sqrt(H^2+A^2)",
+      "passed": true,
+      "metric": 6.0471334863769895e-12
+    },
+    {
+      "id": "P3a H->0 时 Theta->2pi（H^2 收敛）",
+      "passed": true,
+      "metric": 0.0012562602255909994
+    },
+    {
+      "id": "P3b H->inf 时 Theta*H->2piA",
+      "passed": true,
+      "metric": 1.249962215005359e-07
+    },
+    {
+      "id": "P4 B->0 时 Theta->4*atan(A/H)",
+      "passed": true,
+      "metric": 4.637818573627328e-09
+    },
+    {
+      "id": "P6a 展开映射保度量（数值微分）",
+      "passed": true,
+      "metric": 1.4318834536192426e-10
+    },
+    {
+      "id": "P6b 展开底口折线长度收敛一致",
+      "passed": true,
+      "metric": 3.2898592675002833e-09
+    },
+    {
+      "id": "参考数值表 (0.01 度容差)",
+      "passed": true,
+      "metric": 0.00689438007333365
+    },
+    {
+      "id": "F1 反解公式（修正版）",
+      "passed": true,
+      "metric": 2.105693397425057e-11
+    },
+    {
+      "id": "P7 0 < Theta < 2pi（随机抽样）",
+      "passed": true,
+      "metric": 0
+    }
+  ],
+  "all_passed": true,
+  "wedge_theta_deg_B0.005": 106.29102999631428,
+  "wedge_theta_limit_deg": 106.26020470831196,
+  "findings": [
+    "F1: docs/02 圆底反解式写错（多了因子 A），实验给出修正式",
+    "F2: docs/02 三角薄楔行应区分 B=0.005 实际值与该极限值"
+  ]
+}
