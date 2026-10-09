@@ -171,10 +171,12 @@ def residuals_vec(mesh, V, w, st=None):
                       st["wp"] * np.cross(wv, z), st["wp"] * np.cross(u, wv), st["wp"] * np.cross(z, u)], axis=1).reshape(mq, 12))
     if mt:
         a, b, c = V[st["ia"]], V[st["ib"]], V[st["ic"]]
-        d = b - a
-        add(st["wi"] * (np.einsum("ij,ij->i", c, d) - 0.5 * (np.einsum("ij,ij->i", b, b) - np.einsum("ij,ij->i", a, a))),
+        ca = c - a
+        cb = c - b
+        wi = st["wi"] / (mesh.scale() ** 2)
+        add(wi * (np.einsum("ij,ij->i", ca, ca) - np.einsum("ij,ij->i", cb, cb)),
             np.repeat(st["rows_iso"], 9), st["t_cols"].ravel(),
-            np.concatenate([st["wi"] * (a - c), st["wi"] * (c - b), st["wi"] * d], axis=1).ravel())
+            np.concatenate([2.0 * wi * ca, -2.0 * wi * cb, 2.0 * wi * (ca - cb)], axis=1).ravel())
     if st["n_area"]:
         Aq = core.face_areas(V, q) if mq else np.zeros(0)
         At = core.face_areas(V, t) if mt else np.zeros(0)

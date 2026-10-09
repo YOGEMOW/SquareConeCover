@@ -331,12 +331,15 @@ def residuals(mesh, V, w, with_jac=True):
             ia, ib = int(f[mesh.bases[i][0]]), int(f[mesh.bases[i][1]])
             ic = int([x for x in f if x not in (ia, ib)][0])
             a, b, c = V[ia], V[ib], V[ic]
-            d = b - a
-            wi = math.sqrt(w["iso"]) / h2
-            rv = np.array([wi * (float(c @ d) - 0.5 * (float(b @ b) - float(a @ a)))])
+            ca = c - a
+            cb = c - b
+            wi = math.sqrt(w["iso"]) / (h2 * h2)
+            rv = np.array([wi * (float(ca @ ca) - float(cb @ cb))])
             e = []
             for k in range(3):
-                e += [(0, 3 * ic + k, wi * d[k]), (0, 3 * ib + k, wi * (c[k] - b[k])), (0, 3 * ia + k, wi * (a[k] - c[k]))]
+                e += [(0, 3 * ic + k, 2.0 * wi * (ca[k] - cb[k])),
+                      (0, 3 * ib + k, -2.0 * wi * cb[k]),
+                      (0, 3 * ia + k, 2.0 * wi * ca[k])]
             push(rv, e)
     # 全局面积项
     if w.get("area", 0.0) > 0 and (len(mesh.quads) or len(mesh.tris)):
