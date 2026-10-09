@@ -45,13 +45,25 @@
 
 检索词：variational shape approximation, quasi-developable segmentation, Procrustes, shape matching.
 
-## 5. 精确极限（了解即可）
+## 5. 网格规整化求解器（Stage A 相关）
+
+| 文献 | 一句话 | 关系 |
+| --- | --- | --- |
+| Bouaziz, Deuss, Schwartzburg, Weise, Pauly, *Shape-Up: Shaping Discrete Geometry with Projections*, SGP 2012 | 局部投影 + 全局求解的通用框架 | 路线 B 的直接理论依据 |
+| Sorkine & Alexa, *As-Rigid-As-Possible Surface Modeling*, SGP 2007 | 局部-全局迭代的经典形式 | 同上 |
+| Müller et al., *Position Based Dynamics*, 2007 | 约束投影 = 弹簧的视角 | 局部步的直觉来源 |
+| Liu, Zhang, Xu, Gotsman, *A Local/Global Approach to Mesh Parameterization*, SGP 2008 | 局部-全局收敛性分析 | 收敛与稳定性参考 |
+| 通用文献：预条件共轭梯度 + 稀疏最小二乘 | Gauss-Newton 路线 A 的实现基础 | Blender 无 scipy 时自写 CG |
+
+检索词：Shape-Up, local-global, ARAP, position based dynamics, projection solver, Gauss-Newton conjugate gradient.
+
+## 6. 精确极限（了解即可）
 
 - 曲率量化与 flat surface：只有角亏能被"可用角度量子"整除时才可能无缝隙密铺；
 - square-tiled surface / origami 数学：正方形拼接理论；
 - 相关词：Veech surface, translation surface, cone angle quantization.
 
-## 6. 待补充
+## 7. 待补充
 
 - 建筑实践中"锥体 + 平面板"混合表皮的案例；
 - 折纸/纸模型的可展近似；
