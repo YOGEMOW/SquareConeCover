@@ -36,6 +36,46 @@ OUT = os.path.join(REPO, "experiments", "results", "E0004")
 W = dict(core.W_DEFAULT)
 
 
+def crease_struct(mesh):
+    """内部边的面-面配对（把四边面拆成两个三角形），用于折痕/二面角正则。"""
+    tris = [list(f) for f in mesh.tris]
+    for q in mesh.quads:
+        tris.append([int(q[0]), int(q[1]), int(q[2])])
+        tris.append([int(q[0]), int(q[2]), int(q[3])])
+    T = np.asarray(tris, int)
+    if len(T) == 0:
+        return T, np.zeros(0, int), np.zeros(0, int)
+    E = np.concatenate([T[:, [0, 1]], T[:, [1, 2]], T[:, [2, 0]]], axis=0)
+    fid = np.tile(np.arange(len(T)), 3)
+    key = np.sort(E, axis=1)
+    order = np.lexsort((key[:, 1], key[:, 0]))
+    k = key[order]
+    same = np.all(k[1:] == k[:-1], axis=1)
+    idx = np.where(same)[0]
+    # 只取恰好出现两次的边
+    _, counts = np.unique(k, axis=0, return_counts=True)
+    OK = counts == 2
+    pairs = []
+    cnt = {}
+    for i in range(len(k)):
+        kk = (int(k[i, 0]), int(k[i, 1]))
+        cnt.setdefault(kk, []).append(order[i])
+    for kk, ids in cnt.items():
+        if len(ids) == 2:
+            pairs.append(ids)
+    P = np.asarray(pairs, int) if pairs else np.zeros((0, 2), int)
+    if len(P) == 0:
+        return T, np.zeros(0, int), np.zeros(0, int)
+    return T, fid[P[:, 0]], fid[P[:, 1]]
+
+
+def skew(u):
+    z = np.zeros((len(u), 3, 3))
+    z[:, 0, 1] = -u[:, 2]; z[:, 0, 2] = u[:, 1]
+    z[:, 1, 0] = u[:, 2];  z[:, 1, 2] = -u[:, 0]
+    z[:, 2, 0] = -u[:, 1]; z[:, 2, 1] = u[:, 0]
+    return z
+
 def prep_struct(mesh, w):
     """预计算与坐标无关的索引结构。"""
     st = {}
@@ -73,6 +113,13 @@ def prep_struct(mesh, w):
                         + np.arange(3)[None, None, :]).reshape(mt, 9)
     # 全局面积（1 行）
     st["row_area"] = n_par + 2 * mq + mt
+    T, pf, pg = crease_struct(mesh)
+    st["crease_T"], st["crease_pf"], st["crease_pg"] = T, pf, pg
+    st["n_crease"] = len(pf)
+    st["wc"] = math.sqrt(max(0.0, w.get("crease", 0.0)))
+    if st["wc"] <= 0:
+        st["n_crease"] = 0
+    st["row_crease"] = n_par + 2 * mq + mt + (1 if (w.get("area", 0) > 0 and (mq + mt)) else 0)
     st["q_cols_nat"] = st["q_cols"]
     st["t_cols_nat"] = cols_of(t) if mt else np.zeros((0, 9), int)
     st["cols_area"] = np.concatenate([st["q_cols_nat"].ravel(), st["t_cols_nat"].ravel()]) if (mq + mt) else np.zeros(0, int)
@@ -82,13 +129,14 @@ def prep_struct(mesh, w):
     st["lap_v"] = lv
     st["lap_deg"] = np.array([len(mesh.nbr[v]) for v in lv], float) if len(lv) else np.zeros(0)
     st["lap_nbr"] = np.concatenate([np.array(mesh.nbr[int(v)], int) for v in lv]) if len(lv) else np.zeros(0, int)
-    st["row_lap"] = n_par + 2 * mq + mt + st["n_area"]
-    st["n_lap"] = 3 * len(lv)
+    st["rows_crease"] = st["row_crease"] + np.arange(st["n_crease"])
+    st["row_lap"] = st["row_crease"] + st["n_crease"]
+    st["n_lap"] = 3 * len(lv) if st["ws"] > 0 else 0
     # 位置项（自由顶点）
     fv = np.where(mesh.free)[0]
     st["pos_v"] = fv
     st["row_pos"] = st["row_lap"] + st["n_lap"]
-    st["n_pos"] = 3 * len(fv)
+    st["n_pos"] = 3 * len(fv) if st["wpos"] > 0 else 0
     st["n_rows"] = st["row_pos"] + st["n_pos"]
     return st
 
@@ -134,6 +182,35 @@ def residuals_vec(mesh, V, w, st=None):
             st["wa"] * np.concatenate([g.ravel() for g in
                                        ([core.quad_area_grads(V, q)] if mq else []) +
                                        ([core.tri_area_grads(V, t)] if mt else [])]))
+    if st["n_crease"] and st["wc"] > 0:
+        T, pf, pg = st["crease_T"], st["crease_pf"], st["crease_pg"]
+        a = V[T[:, 1]] - V[T[:, 0]]
+        b = V[T[:, 2]] - V[T[:, 0]]
+        c = np.cross(a, b)
+        L = np.linalg.norm(c, axis=1) + 1e-30
+        nrm = c / L[:, None]
+        ident = np.eye(3)[None, :, :].repeat(len(T), axis=0)
+        M = ident - nrm[:, :, None] * nrm[:, None, :]
+        dnp1 = -np.einsum("nij,njk->nik", M, skew(b)) / L[:, None, None]
+        dnp2 = np.einsum("nij,njk->nik", M, skew(a)) / L[:, None, None]
+        dnp0 = -(dnp1 + dnp2)
+        nf, ng = nrm[pf], nrm[pg]
+        cosang = np.einsum("ij,ij->i", nf, ng)
+        add(st["wc"] * (1.0 - cosang), st["rows_crease"], np.zeros(st["n_crease"], int),
+            np.zeros(st["n_crease"], float))
+        r_ent, c_ent, v_ent = [], [], []
+        for k, (fi, gi) in enumerate(zip(pf, pg)):
+            for j in range(3):
+                vtx = int(T[fi, j])
+                grad = -st["wc"] * (np.stack([dnp0[fi], dnp1[fi], dnp2[fi]])[j] @ ng[gi])
+                for comp in range(3):
+                    r_ent.append(st["rows_crease"][k]); c_ent.append(3 * vtx + comp); v_ent.append(float(grad[comp]))
+            for j in range(3):
+                vtx = int(T[gi, j])
+                grad = -st["wc"] * (np.stack([dnp0[gi], dnp1[gi], dnp2[gi]])[j] @ nf[k])
+                for comp in range(3):
+                    r_ent.append(st["rows_crease"][k]); c_ent.append(3 * vtx + comp); v_ent.append(float(grad[comp]))
+        blocks_rows.append(np.array(r_ent)); blocks_cols.append(np.array(c_ent)); blocks_vals.append(np.array(v_ent))
     if st["n_lap"] and st["ws"] > 0:
         lv, deg = st["lap_v"], st["lap_deg"]
         nv_l = len(lv)
